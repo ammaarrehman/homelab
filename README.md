@@ -1,139 +1,102 @@
-# Raspberry Pi 5 Homelab: Network DNS Filtering with AdGuard Home
+# Home Network DNS Filtering and Recursive Resolution
 
-A personal homelab project. This documents standing up a Raspberry Pi 5 as a headless Linux node and running AdGuard Home for network-wide DNS filtering.
+Self-hosted DNS filtering and recursive DNS resolution on a Raspberry Pi 5. AdGuard Home filters ads and tracker domains, and Unbound resolves queries directly from the root DNS servers instead of forwarding them to a public provider.
 
-## Goal
+## Overview
 
-Run a low-power, always-on DNS resolver that filters ads and trackers for the devices pointed at it, and use it as the first hands-on service in a growing homelab.
+This project runs two services on a Raspberry Pi 5. AdGuard Home is the DNS server my devices point at, and it drops ad, tracker, and malicious domains using blocklists. Behind it, Unbound does the actual lookups by walking the DNS tree itself, starting at the root servers, rather than handing the query to Cloudflare or Google. The result is private DNS filtering where no outside provider sees a full record of what I look up.
 
-## Hardware
+## Purpose
 
-- Raspberry Pi 5
-- microSD boot drive (NVMe planned, mounted in a 1U bracket inside a DeskPi RackMate T1)
-- Network: Google Wifi / Nest mesh, 192.168.86.0/24
+I wanted ad and tracker blocking across my own devices without installing a separate blocker in every app or browser, and I didn't want to forward every DNS query to a single company that could log all of it. Running my own recursive resolver keeps those lookups local and lets me validate DNSSEC myself. It is also the first real service in my homelab and a hands-on way to learn Linux, DNS, and networking as I work toward IT roles.
 
-## Base OS setup
+## Technologies Used
 
-- Raspberry Pi OS Lite, 64-bit, headless (no desktop)
-- Flashed with Raspberry Pi Imager with SSH, Wi-Fi, hostname, and user preconfigured, so the Pi came up headless on first boot
-- Hostname: `raspberrypi5`
-- User: `mar`
+- Raspberry Pi 5 (Raspberry Pi OS Lite, 64-bit, headless)
+- AdGuard Home (DNS filtering and blocklists)
+- Unbound (recursive resolver with local DNSSEC validation)
 
-First connection:
+## Architecture
 
-```bash
-ssh mar@raspberrypi5.local
+```
+Devices (MacBook, phone)
+        |
+        v
+AdGuard Home      filtering and blocklists, the DNS server devices point at
+        |
+        v
+Unbound           recursive resolution, listening on 127.0.0.1:5335
+        |
+        v
+Root DNS servers -> TLD servers -> authoritative servers
 ```
 
-Update the system before anything else:
+## Implementation Steps
 
-```bash
-sudo apt update && sudo apt full-upgrade -y
-sudo reboot
-```
+- Flashed Raspberry Pi OS Lite (64-bit) with SSH and Wi-Fi preconfigured, so the Pi came up headless on first boot
+- Set a static IP on the Pi with NetworkManager so devices always reach it at the same address
+- Installed AdGuard Home and ran its setup wizard
+- Pointed my devices' DNS at the Pi by hand, since I do not control the router on this network
+- Installed Unbound and configured it as a recursive resolver on port 5335
+- Validated the config with `unbound-checkconf`, then pointed AdGuard's upstream at `127.0.0.1:5335`
+- Verified resolution and DNSSEC with `dig`
 
-## Project 1: AdGuard Home
+## Key Concepts
 
-### 1. Give the Pi a static IP
+**What is DNS:** DNS translates human-readable domain names like example.com into the IP addresses that devices actually connect to. Without it you would have to memorize a number for every site.
 
-The router on this network is not under my control (shared household network), so instead of a DHCP reservation the static IP is set on the Pi itself with NetworkManager.
+**AdGuard Home vs Unbound here:** AdGuard is the DNS server my devices send their queries to, and its job is filtering. It checks each domain against blocklists and refuses the ones that are ads, trackers, or known malicious. Unbound sits behind AdGuard and does the actual resolving for anything that is not blocked.
 
-Find the active connection name and current IP:
+**Recursive resolution vs forwarding:** a recursive resolver answers a query by walking the DNS hierarchy itself. It asks a root server, which points it to the .com servers, which point it to the domain's authoritative server, which returns the final answer. Forwarding skips all of that and hands the whole question to a public resolver like Cloudflare, trusting whatever it returns.
 
-```bash
-nmcli con show --active
-hostname -I
-```
+**Why run Unbound instead of forwarding to Cloudflare or Google:** privacy and independence. With forwarding, one company sees every domain every device looks up. With Unbound I resolve queries myself and validate DNSSEC locally, so no third party gets a full map of my browsing. The tradeoff is that the first lookup of a new domain is slightly slower, and I lose any filtering the provider would have done, which is fine because AdGuard handles filtering.
 
-Pin the IP. This network is 192.168.86.0/24, gateway 192.168.86.1, and the Pi keeps .34. The Pi's own DNS is set to the router so it can still resolve names while AdGuard is being installed:
+## Challenges
 
-```bash
-sudo nmcli con mod "netplan-wlan0-office" \
-  ipv4.method manual \
-  ipv4.addresses 192.168.86.34/24 \
-  ipv4.gateway 192.168.86.1 \
-  ipv4.dns 192.168.86.1
-sudo nmcli con up "netplan-wlan0-office"
-```
+**Static IP on a netplan-managed connection.** My Wi-Fi connection was managed by netplan, so I was not sure a static IP set with `nmcli` would survive a reboot. I set it, rebooted, and confirmed with `hostname -I` that the Pi still came up at the same address.
 
-Use the connection name shown by `nmcli con show --active` (here it is `netplan-wlan0-office`). SSH may drop for a second while the connection reapplies; reconnect with `ssh mar@raspberrypi5.local`.
+**No control over the router.** This is a shared household network and I cannot change router settings, so a DHCP reservation and network-wide DNS were not options. I worked around it by pinning the static IP on the Pi itself and pointing each of my devices at it directly.
 
-The `netplan-` prefix means netplan manages the network config, so confirm the static IP survives a reboot with `hostname -I`. If it reverts to DHCP, set the static address in the netplan YAML under `/etc/netplan/` instead, then run `sudo netplan apply`.
+**Shutting the Pi down broke my phone's internet.** Because my phone's DNS pointed at the Pi, powering the Pi off left the phone unable to resolve anything. Wi-Fi looked broken but it was just DNS. The fix was setting the phone's DNS back to automatic, and the takeaway was that anything other devices depend on needs to stay up.
 
-### 2. Install AdGuard Home
+**Minimal base image.** Pi OS Lite ships without tools like `dig`, so I installed `dnsutils` before I could test resolution.
 
-```bash
-curl -s -S -L https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh
-```
+## Lessons Learned
 
-The installer prints a setup URL like `http://192.168.86.34:3000`.
+Installing a DNS server changes nothing on its own. AdGuard only filtered traffic once I actually pointed devices at it. The software just stands up a resolver; the routing is what makes it do anything.
 
-### 3. Run the setup wizard
+A device is only as good as the resolver it points at. The phone incident made the single point of failure concrete: if the resolver is down, the device has no internet even though Wi-Fi is connected. That is why uptime and, eventually, a second resolver matter.
 
-Open the setup URL in a browser and set:
+Per-device DNS is the right call on a network I do not own. It filters my devices without risking everyone else's internet if the Pi reboots.
 
-- Admin web interface port: `3000`
-- DNS port: `53`
+I understand the DNS resolution path now. Watching Unbound walk from root to TLD to authoritative made recursive resolution real instead of a definition I had memorized.
 
-Then create the admin username and password.
+## Future Improvements
 
-### 4. Point devices at the Pi
-
-Installing AdGuard does nothing until DNS traffic flows through it. With no router access there is no network-wide DNS change, so each device is pointed at the Pi by hand. This also keeps the rest of the household off the Pi, so a reboot never takes down anyone else's internet.
-
-Set DNS to `192.168.86.34` on each device:
-
-- macOS: System Settings, Network, Wi-Fi, Details, DNS, add the IP
-- iPhone: Wi-Fi, tap the network, Configure DNS, Manual, add the IP
-- Windows: network adapter settings, edit DNS, Manual, add the IP
-
-### 5. Test
-
-- Reconnect a device to Wi-Fi so it picks up the new DNS
-- Open the AdGuard dashboard and watch the Query Log fill with live requests
-- Confirm blocked domains show up as filtered
-
-Quick check from any machine:
-
-```bash
-nslookup google.com 192.168.86.34
-```
+- Move AdGuard Home into Docker for easier updates and backups
+- Add a second resolver for redundancy so a single reboot does not take DNS down
+- Monitor the Pi and services with Uptime Kuma
+- Write a short comparison of AdGuard Home and Pi-hole
+- Deploy network-wide if I get control of the router
 
 ## Screenshots
 
-Static IP set on the Pi and confirmed after a reboot:
-
-![Static IP via NetworkManager](screenshots/static-ip.png)
-
 AdGuard Home dashboard with live query stats:
 
-![AdGuard Home dashboard](screenshots/adguard-dashboard.png)
+![AdGuard dashboard](screenshots/adguard-dashboard.png)
+
+AdGuard upstream DNS pointed at the local Unbound resolver:
+
+![AdGuard upstream DNS](screenshots/upstream-dns.png)
+
+Unbound resolving a query directly, run with dig against 127.0.0.1:5335:
+
+![dig resolving google.com](screenshots/dig-google.png)
+
+DNSSEC validation rejecting a deliberately broken domain. SERVFAIL is the correct, healthy result:
+
+![dig DNSSEC test](screenshots/dig-dnssec.png)
 
 Query log showing requests filtered in real time:
 
 ![AdGuard query log](screenshots/query-log.png)
-
-## Roadmap
-
-1. Tailscale: secure remote access to the Pi from anywhere
-2. Docker: container platform for everything that follows
-3. Uptime Kuma: self-hosted monitoring dashboard, runs in Docker
-4. Write-up comparing AdGuard Home and Pi-hole as DNS filtering approaches
-
-## Notes
-
-- A device's DNS server must point at the Pi for filtering to happen. The install step alone changes nothing.
-- The Pi needs a fixed IP. With no router access, the static IP is set on the Pi itself rather than reserved at the router.
-- Per-device DNS keeps a single point of failure off a shared household network. If the Pi reboots, only the devices pointed at it are affected.
-- AdGuard Home and Pi-hole both use port 53, so only one runs on a given host at a time.
-
-## Linux commands worth knowing for this build
-
-```bash
-pwd        # where am I
-ls         # list files
-cd         # change directory
-ip a       # network interfaces and IPs
-free -h    # memory usage
-df -h      # disk usage
-```
