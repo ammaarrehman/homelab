@@ -12,9 +12,13 @@ AdGuard Home for DNS filtering, with Unbound behind it doing recursive resolutio
 Uptime Kuma running in Docker, monitoring the services from the DNS project plus the Pi and general connectivity, with a status dashboard and uptime history.
 **Docker, Containers, Monitoring, Linux**
 
+### [Remote Access with Tailscale](remote-access/)
+Secure remote access to the Pi and its services from any network, with no ports opened on the router. Built on Tailscale's mesh VPN, which uses WireGuard underneath and NAT traversal instead of port forwarding.
+**Tailscale, VPN, WireGuard, Networking, Remote Administration**
+
 ## Roadmap
 
-- Remote access with Tailscale, then a self-hosted WireGuard setup
+- A self-hosted WireGuard setup (PiVPN) to compare against Tailscale
 - A Grafana and Prometheus monitoring stack
 - Infrastructure as Code on AWS with Terraform
 
