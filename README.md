@@ -16,10 +16,13 @@ Uptime Kuma running in Docker, monitoring the services from the DNS project plus
 Secure remote access to the Pi and its services from any network, with no ports opened on the router. Built on Tailscale's mesh VPN, which uses WireGuard underneath and NAT traversal instead of port forwarding.
 **Tailscale, VPN, WireGuard, Networking, Remote Administration**
 
+### [Metrics Monitoring with Prometheus and Grafana](monitoring-stack/)
+A Docker Compose stack: Prometheus scrapes host and container metrics, Grafana visualizes them. Where uptime monitoring shows whether a service is up, this shows how the Pi and its containers are performing over time.
+**Docker Compose, Prometheus, Grafana, Observability, Metrics**
+
 ## Roadmap
 
 - A self-hosted WireGuard setup (PiVPN) to compare against Tailscale
-- A Grafana and Prometheus monitoring stack
 - Infrastructure as Code on AWS with Terraform
 
 ## About
