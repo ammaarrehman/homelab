@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ammaar Rehman - Homelab</title>
+<style>
+  :root { --bg:#0a0a0a; --fg:#e6e6e6; --muted:#8a8a8a; --accent:#FFD60A; --line:#1c1c1c; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--fg); font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; line-height:1.65; padding:2.5rem 1.25rem; }
+  .wrap { max-width:720px; margin:0 auto; }
+  .prompt { color:var(--accent); margin-bottom:1.25rem; }
+  h1 { font-size:1.5rem; margin-bottom:0.25rem; }
+  .sub { color:var(--muted); margin-bottom:2rem; }
+  h2 { font-size:0.95rem; color:var(--accent); margin:2rem 0 0.75rem; text-transform:lowercase; }
+  ul { list-style:none; }
+  li { padding:0.45rem 0; border-bottom:1px solid var(--line); }
+  .tag { color:var(--muted); }
+  a { color:var(--fg); text-decoration:none; border-bottom:1px solid var(--accent); }
+  a:hover { color:var(--accent); }
+  footer { margin-top:2.5rem; color:var(--muted); font-size:0.85rem; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="prompt">mar@homelab:~ $ cat profile.txt</div>
+    <h1>Ammaar Rehman</h1>
+    <div class="sub">Information Systems student. Building infrastructure one project at a time.</div>
+
+    <h2>// homelab projects</h2>
+    <ul>
+      <li>DNS Filtering and Recursive Resolution <span class="tag">: AdGuard Home, Unbound, DNSSEC</span></li>
+      <li>Self-Hosted Uptime Monitoring <span class="tag">: Docker, Uptime Kuma</span></li>
+      <li>Remote Access <span class="tag">: Tailscale mesh VPN</span></li>
+      <li>Metrics Monitoring <span class="tag">: Prometheus, Grafana</span></li>
+      <li>This page <span class="tag">: deployed to AWS S3 and CloudFront with Terraform</span></li>
+    </ul>
+
+    <h2>// links</h2>
+    <ul>
+      <li><a href="https://github.com/ammaarrehman/homelab">github.com/ammaarrehman/homelab</a></li>
+    </ul>
+
+    <footer>Served from a private S3 bucket via CloudFront. Provisioned with Terraform.</footer>
+  </div>
+</body>
+</html>

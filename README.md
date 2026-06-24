@@ -1,6 +1,6 @@
 # Homelab
 
-A growing set of self-hosted networking and infrastructure projects, built and documented as I learn. Most of this runs on a Raspberry Pi 5, with cloud work to come. Each project has its own folder with a full writeup, the steps I took, the concepts behind it, and screenshots.
+A growing set of self-hosted networking and infrastructure projects, built and documented as I learn. Most of this runs on a Raspberry Pi 5, plus a cloud project built with Terraform. Each project has its own folder with a full writeup, the steps I took, the concepts behind it, and screenshots.
 
 ## Projects
 
@@ -20,11 +20,15 @@ Secure remote access to the Pi and its services from any network, with no ports 
 A Docker Compose stack: Prometheus scrapes host and container metrics, Grafana visualizes them. Where uptime monitoring shows whether a service is up, this shows how the Pi and its containers are performing over time.
 **Docker Compose, Prometheus, Grafana, Observability, Metrics**
 
+### [Static Site on AWS with Terraform](terraform-aws-static-site/)
+A static site provisioned entirely with Terraform: a private S3 bucket served over HTTPS through CloudFront with Origin Access Control. Infrastructure as Code, deployed and destroyed with one command, inside the AWS free tier.
+**Terraform, AWS, S3, CloudFront, Infrastructure as Code**
+
 ## Roadmap
 
 - A self-hosted WireGuard setup (PiVPN) to compare against Tailscale
-- Infrastructure as Code on AWS with Terraform
+- Alertmanager on top of the Prometheus stack for notifications
 
 ## About
 
-Built by Ammaar Rehman. Information Systems student working toward IT and cybersecurity roles, building this homelab project by project to get hands-on with Linux, networking, and self-hosted infrastructure.
+Built by Ammaar Rehman. Information Systems student working toward IT and cybersecurity roles, building this homelab project by project to get hands-on with Linux, networking, cloud, and self-hosted infrastructure.
