@@ -1,0 +1,4 @@
+[Desktop Entry]
+Type=Application
+Name=Homepage Kiosk
+Exec=chromium --kiosk --noerrdialogs --disable-infobars --password-store=basic --check-for-update-interval=31536000 http://localhost:3003

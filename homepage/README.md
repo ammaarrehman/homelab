@@ -85,3 +85,15 @@ The Homepage dashboard showing services and system stats:
 The dashboard running as a container alongside the rest of the stack:
 
 ![Homepage container](screenshots/container.png)
+
+## Kiosk mode (rack touchscreen)
+
+The dashboard is displayed on the rack's touchscreen by launching Chromium in kiosk mode on boot. The autostart file is in `kiosk/homepage-kiosk.desktop`, copied to `~/.config/autostart/` on the Pi running the screen.
+
+```bash
+sudo apt install -y chromium unclutter
+cp kiosk/homepage-kiosk.desktop ~/.config/autostart/
+sudo reboot
+```
+
+The `--password-store=basic` flag skips the GNOME Keyring password prompt that otherwise blocks the kiosk on first launch. On the headless server this dashboard points at, the screen runs on a separate Pi; here it runs locally pointed at `localhost:3003`.
