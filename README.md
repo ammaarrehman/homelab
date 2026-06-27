@@ -24,8 +24,13 @@ A Docker Compose stack: Prometheus scrapes host and container metrics, Grafana v
 A static site provisioned entirely with Terraform: a private S3 bucket served over HTTPS through CloudFront with Origin Access Control. Infrastructure as Code, deployed and destroyed with one command, inside the AWS free tier.
 **Terraform, AWS, S3, CloudFront, Infrastructure as Code**
 
+### [Homelab Dashboard with Homepage](homepage/)
+A single config-driven dashboard for the whole homelab, running in Docker. Live service status, quick links, and Pi system stats on one page. Becomes the rack touchscreen's display in kiosk mode.
+**Docker, Homepage, YAML, Self-Hosting**
+
 ## Roadmap
 
+- High availability DNS across two Raspberry Pis
 - A self-hosted WireGuard setup (PiVPN) to compare against Tailscale
 - Alertmanager on top of the Prometheus stack for notifications
 

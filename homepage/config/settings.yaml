@@ -1,0 +1,15 @@
+title: Ammaar's Homelab
+favicon: https://www.raspberrypi.com/favicon.ico
+
+theme: dark
+color: slate
+
+headerStyle: clean
+
+layout:
+  Network Services:
+    style: row
+    columns: 2
+  Monitoring:
+    style: row
+    columns: 3

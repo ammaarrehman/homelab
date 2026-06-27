@@ -1,0 +1,9 @@
+- Homelab:
+    - GitHub Repo:
+        - abbr: GH
+          href: https://github.com/ammaarrehman/homelab
+
+- Admin:
+    - Tailscale Admin:
+        - abbr: TS
+          href: https://login.tailscale.com/admin/machines

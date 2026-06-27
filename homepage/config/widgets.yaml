@@ -1,0 +1,20 @@
+# Top-of-page widgets. The resources widget reads the Pi's CPU, memory, temp,
+# and disk directly from the host, no API keys needed.
+
+- resources:
+    label: Raspberry Pi 5
+    cpu: true
+    memory: true
+    cputemp: true
+    uptime: true
+    disk: /
+
+- search:
+    provider: duckduckgo
+    target: _blank
+
+- datetime:
+    text_size: xl
+    format:
+      timeStyle: short
+      dateStyle: long

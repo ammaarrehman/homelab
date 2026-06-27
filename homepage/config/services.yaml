@@ -1,0 +1,34 @@
+# Each href uses the Pi's LAN IP so the tiles work from any device on the network.
+# The "ping" check shows a live up/down dot without needing API keys.
+
+- Network Services:
+    - AdGuard Home:
+        icon: adguard-home.png
+        href: http://192.168.86.34:3000
+        description: DNS filtering and blocklists
+        siteMonitor: http://192.168.86.34:3000
+
+    - Uptime Kuma:
+        icon: uptime-kuma.png
+        href: http://192.168.86.34:3001
+        description: Service uptime monitoring
+        siteMonitor: http://192.168.86.34:3001
+
+- Monitoring:
+    - Grafana:
+        icon: grafana.png
+        href: http://192.168.86.34:3002
+        description: Metrics dashboards
+        siteMonitor: http://192.168.86.34:3002
+
+    - Prometheus:
+        icon: prometheus.png
+        href: http://192.168.86.34:9090
+        description: Metrics scraping and storage
+        siteMonitor: http://192.168.86.34:9090
+
+    - cAdvisor:
+        icon: cadvisor.png
+        href: http://192.168.86.34:8080
+        description: Container metrics
+        siteMonitor: http://192.168.86.34:8080
