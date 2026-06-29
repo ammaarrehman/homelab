@@ -1,0 +1,5 @@
+# Real sync config holds AdGuard admin credentials - never commit
+adguardhome-sync/adguardhome-sync.yaml
+
+# OS noise
+.DS_Store

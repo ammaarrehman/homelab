@@ -1,0 +1,23 @@
+# AdGuardHome-sync configuration (EXAMPLE - safe to commit)
+#
+# Copy this to adguardhome-sync.yaml and fill in the real password.
+# The real adguardhome-sync.yaml is gitignored and must NEVER be committed.
+#
+# origin = source of truth (Pi #1), replica(s) = targets kept in sync (Pi #2).
+
+cron: "*/10 * * * *"        # sync every 10 minutes
+runOnStart: true            # also sync immediately on container start
+
+origin:
+  url: http://192.168.86.34:3000
+  username: REPLACE_WITH_ADMIN_USER
+  password: REPLACE_WITH_ADMIN_PASSWORD
+
+replicas:
+  - url: http://192.168.86.35:3000
+    username: REPLACE_WITH_ADMIN_USER
+    password: REPLACE_WITH_ADMIN_PASSWORD
+
+# Optional web UI for sync status, reachable at http://192.168.86.34:8085
+api:
+  port: 8080
