@@ -28,6 +28,8 @@ A static site provisioned entirely with Terraform: a private S3 bucket served ov
 A single config-driven dashboard for the whole homelab, running in Docker. Live service status, quick links, and Pi system stats on one page. Becomes the rack touchscreen's display in kiosk mode.
 **Docker, Homepage, YAML, Self-Hosting**
 
+- [High Availability DNS](ha-dns) - keepalived floating VIP with automatic failover across two Pi nodes, plus config sync
+
 ## Roadmap
 
 - High availability DNS across two Raspberry Pis
